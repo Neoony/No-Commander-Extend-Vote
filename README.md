@@ -3,7 +3,7 @@ Extend commander vote when nobody opted in and someone voted for him </br>
 
 Created by Neoony </br>
 
-THIS IS IN VERY EARLY STATE, TESTING PRINT TO CHAT MESSAGES ARE STILL IN, SO THAT I CAN EASILY SEE WHEN THINGS HAPPEN  </br>
+THIS IS IN VERY EARLY STATE </br>
 
 If the commander vote time is below 60 it will add extra time if no team has yet voted for a commander. </br>
 It will keep extending the vote time by approximately 20 seconds, each time it gets below 60 seconds with no comms  </br>

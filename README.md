@@ -26,11 +26,11 @@ If you can think of another way, Iam all ears. But no event seems to exist for s
 Planned features </br>
 If the game starts without a commander elected, it will start a vote for next map and change the map. </br>
 
-Changelog:
-v0.1
--First pre-release
-v0.2
--Added new console commands
--Added config
--Better messages handling
--Few bigfixes
+Changelog: </br>
+v0.1 </br>
+-First pre-release </br>
+v0.2 </br>
+-Added new console commands </br>
+-Added config </br>
+-Better messages handling </br>
+-Few bigfixes </br>

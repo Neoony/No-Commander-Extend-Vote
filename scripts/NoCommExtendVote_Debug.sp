@@ -31,7 +31,7 @@ public Plugin myinfo =
 	author = "Neoony",
 	description = "Extend commander vote when nobody opted in and someone voted for him",
 	version = PluginVer,
-	url = "https://github.com/Neoony/No-Commander-Extend-Vote"
+	url = ""
 }
 
 ConVar g_cvPreGameTime;
@@ -57,19 +57,19 @@ public void OnPluginStart()
 	
 public Event_CommVote(Handle:event, const char[] name, bool dontBroadcast)
 {	
-	//PrintToChatAll("commander_vote event");
-	//PrintToServer("commander_vote event");
+	PrintToChatAll("commander_vote event");
+	PrintToServer("commander_vote event");
 	int cvote = GetEventInt(event, "team");
 	if (cvote == 0)
 	{
 		PrintToChatAll("NF received comm vote");
-		//PrintToServer("NF received comm vote");
+		PrintToServer("NF received comm vote");
 		nf1vote = 1;
 	} 
 	if (cvote == 1) 
 	{
 		PrintToChatAll("BE received comm vote");
-		//PrintToServer("BE received comm vote");
+		PrintToServer("BE received comm vote");
 		be1vote = 1;
 	}
 }
@@ -78,32 +78,35 @@ public Event_CommVoteTime(Handle:event, const char[] name, bool dontBroadcast)
 {
 	int cexist = GetEventInt(event, "commander_exists");
 	int vtime = GetEventInt(event, "time");
-	//PrintToChatAll("commander_vote_time event");
-	//PrintToServer("commander_vote_time event");
+	PrintToChatAll("commander_vote_time event");
+	PrintToServer("commander_vote_time event");
 	if (cexist == 0)
 	{
-		//PrintToChatAll("infantry map - plugin disabled");
-		//PrintToServer("infantry map - plugin disabled");
+		PrintToChatAll("infantry map - plugin disabled");
+		PrintToServer("infantry map - plugin disabled");
 	}
 	else if (cexist == 1)
 	{
-		//PrintToChatAll("commander exists");
-		//PrintToServer("commander exists");
+		PrintToChatAll("commander exists");
+		PrintToServer("commander exists");
 		if (vtime < 60)
 		{
-			//PrintToChatAll("less than 60");
-			//PrintToServer("less than 60");
+			PrintToChatAll("less than 60");
+			PrintToServer("less than 60");
 			if (nf1vote == 1 && be1vote == 1)
 			{
+				PrintToChatAll("Both teams have a commander, not extending");
 				PrintToChatAll("Both teams have a commander, not extending");
 				commsready = 1;
 			}
 			if (nf1vote != 1)
 			{
 				PrintToChatAll("NF has no commander, extending time");
+				PrintToChatAll("NF has no commander, extending time");
 			}
 			if (be1vote != 1)
 			{
+				PrintToChatAll("BE has no commander, extending time");
 				PrintToChatAll("BE has no commander, extending time");
 			}
 			if (commsready != 1)
@@ -117,28 +120,28 @@ public Event_CommVoteTime(Handle:event, const char[] name, bool dontBroadcast)
 	
 public Event_ElectedPlayer(Handle:event, const char[] name, bool dontBroadcast)
 {	
-	//PrintToChatAll("commander_elected_player event");
-	//PrintToServer("commander_elected_player event");
+	PrintToChatAll("commander_elected_player event");
+	PrintToServer("commander_elected_player event");
 	int enf = GetEventInt(event, "elected_nf_comm_id");
 	int ebe = GetEventInt(event, "elected_be_comm_id");
 	if (enf == 1)
 	{
 		PrintToChatAll("NF elected commander");
-		//PrintToServer("NF elected commander");
+		PrintToServer("NF elected commander");
 	}
 	if (enf != 1)
 	{
 		PrintToChatAll("NF started with no commander");
-		//PrintToServer("NF started with no commander");
+		PrintToServer("NF started with no commander");
 	}
 	if (ebe == 1)
 	{
 		PrintToChatAll("BE elected commander");
-		//PrintToServer("BE elected commander");
+		PrintToServer("BE elected commander");
 	}
 	if (ebe != 1)
 	{
 		PrintToChatAll("NF started with no commander");
-		//PrintToServer("NF started with no commander");
+		PrintToServer("NF started with no commander");
 	}
 }		

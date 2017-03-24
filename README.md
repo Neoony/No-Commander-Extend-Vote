@@ -38,3 +38,5 @@ v0.2.1 Quickfix </br>
 -Fixed infantry map spam </br>
 -Added message about plugin on "OnClientPutInServer" </br>
 -Few small message changes </br>
+v0.2.2 Quickadd </br>
+-Disabled "comm received vote" and added status of commanders into Timer Info message.

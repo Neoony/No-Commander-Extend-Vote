@@ -34,6 +34,7 @@ v0.2 </br>
 -Added config </br>
 -Better messages handling </br>
 -Few bigfixes </br>
-v0.2.1 Quickfix
--Fixed infantry map spam
--Added message about plugin on "OnClientPutInServer"
+v0.2.1 Quickfix </br>
+-Fixed infantry map spam </br>
+-Added message about plugin on "OnClientPutInServer" </br>
+-Few small message changes </br>

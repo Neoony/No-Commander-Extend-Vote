@@ -23,7 +23,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#define PluginVer "v0.2"
+#define PluginVer "v0.2.1"
  
 public Plugin myinfo =
 {
@@ -77,7 +77,12 @@ public void OnPluginStart()
 	CreateTimer(msgtimer, InfoMsg, _, TIMER_REPEAT);
 	
 	//Message
-	PrintToChatAll("[NCEV]: No Commander Extend Vote by Neoony - Loaded");
+	PrintToServer("[NCEV]: No Commander Extend Vote by Neoony - Loaded");
+}
+
+public OnClientPutInServer(Client)
+{
+	PrintToChat(Client, "[NCEV]: This server is running [No Comm Extend Vote] by Neoony");
 }
 
 public Action InfoMsg(Handle timer)
@@ -91,10 +96,11 @@ public Action InfoMsg(Handle timer)
 		PrintToChatAll("[NCEV]: Not enough players - plugin disabled");
 		//PrintToServer("[NCEV]: Not enough players - plugin disabled");
 	}
-	if (cexist == 0)
+	if (cexist == 0 && plugindone != 1)
 	{
-		//PrintToChatAll("NCEV: Infantry map - plugin disabled");
-		PrintToServer("NCEV: Infantry map - plugin disabled");
+		//PrintToChatAll("[NCEV]: Infantry map - plugin disabled");
+		PrintToServer("[NCEV]: Infantry map - plugin disabled");
+		plugindone = 1;
 	}
 	if (plugindone == 0)
 	{
@@ -102,6 +108,7 @@ public Action InfoMsg(Handle timer)
     }
 	if (plugindone == 1)
 	{
+		PrintToServer("[NCEV]: Plugin disabled.");
 		return Plugin_Stop;
 	}
 	return Plugin_Continue;

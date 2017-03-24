@@ -23,7 +23,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#define PluginVer "v0.2.1"
+#define PluginVer "v0.2.2"
  
 public Plugin myinfo =
 {
@@ -102,6 +102,22 @@ public Action InfoMsg(Handle timer)
 		PrintToServer("[NCEV]: Infantry map - plugin disabled");
 		plugindone = 1;
 	}
+	if (nf1vote == 1)
+	{
+		PrintToChatAll("[NCEV]: NF has a commander candidate/s with votes.");
+	}
+	if (nf1vote == 0)
+	{
+		PrintToChatAll("[NCEV]: NF has no commander candidate with votes.");
+	}
+	if (be1vote == 1)
+	{
+		PrintToChatAll("[NCEV]: BE has a commander candidate/s with votes.");
+	}
+	if (be1vote == 0)
+	{
+		PrintToChatAll("[NCEV]: BE has no commander candidate with votes.");
+	}
 	if (plugindone == 0)
 	{
         return Plugin_Continue;
@@ -111,6 +127,7 @@ public Action InfoMsg(Handle timer)
 		PrintToServer("[NCEV]: Plugin disabled.");
 		return Plugin_Stop;
 	}
+	
 	return Plugin_Continue;
 }
 	
@@ -121,13 +138,13 @@ public Event_CommVote(Handle:event, const char[] name, bool dontBroadcast)
 	int cvote = GetEventInt(event, "team");
 	if (cvote == 0)
 	{
-		PrintToChatAll("[NCEV]: NF has received comm vote");
+		//PrintToChatAll("[NCEV]: NF has received comm vote");
 		//PrintToServer("[NCEV]: NF has received comm vote");
 		nf1vote = 1;
 	} 
 	if (cvote == 1) 
 	{
-		PrintToChatAll("[NCEV]: BE has received comm vote");
+		//PrintToChatAll("[NCEV]: BE has received comm vote");
 		//PrintToServer("[NCEV]: BE has received comm vote");
 		be1vote = 1;
 	}

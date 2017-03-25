@@ -23,7 +23,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#define PluginVer "v0.3"
+#define PluginVer "v0.4"
  
 public Plugin myinfo =
 {
@@ -80,6 +80,24 @@ public void OnPluginStart()
 	HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("commander_elected_player", Event_ElectedPlayer);
 	
+	//Message
+	PrintToServer("[NCEV]: No Commander Extend Vote by Neoony - Loaded");
+}
+
+public OnClientPutInServer(Client)
+{
+	PrintToChat(Client, "[NCEV]: This server is running [No Comm Extend Vote] by Neoony");
+}
+
+public OnMapStart()
+{
+	//Create or load config files
+	AutoExecConfig(true, "NoCommExtendVote");
+	addvotetime = nc_addvotetime.IntValue;
+	minplayers = nc_minplayers.IntValue;
+	msgtimer = nc_msgtimer.IntValue + 0.0;
+	marktime = nc_marktime.IntValue;
+	
 	//Clear timer
 	if (InfoMessage != INVALID_HANDLE)
 	{
@@ -89,14 +107,6 @@ public void OnPluginStart()
 	
 	//Timers for messages
 	InfoMessage = CreateTimer(msgtimer, InfoMsg, _, TIMER_REPEAT);
-	
-	//Message
-	PrintToServer("[NCEV]: No Commander Extend Vote by Neoony - Loaded");
-}
-
-public OnClientPutInServer(Client)
-{
-	PrintToChat(Client, "[NCEV]: This server is running [No Comm Extend Vote] by Neoony");
 }
 
 public OnMapEnd()
@@ -119,7 +129,7 @@ public Action InfoMsg(Handle timer)
 	GetConVarInt(nc_msgtimer);
 	if (teamhasplayer == 1)
 	{
-		if (commsready == 1 && plugindone != 1)
+		if (cexist == 1 && commsready == 1 && plugindone != 1)
 		{
 			PrintToChatAll("[NCEV]: Both teams have a commander, not extending");
 		}
@@ -133,20 +143,26 @@ public Action InfoMsg(Handle timer)
 			//PrintToChatAll("[NCEV]: Infantry map - plugin disabled");
 			PrintToServer("[NCEV]: Infantry map - plugin disabled");
 			plugindone = 1;
+			if (InfoMessage != INVALID_HANDLE && plugindone == 1)
+			{
+				KillTimer(InfoMessage);
+				PrintToServer("[NCEV]: InfoMessage disabled. End of vote.");
+				InfoMessage = INVALID_HANDLE;
+			}
 		}
-		if (nf1vote == 1 && commsready == 0)
+		if (cexist == 1 && nf1vote == 1 && commsready == 0 && minplayersnr == 0)
 		{
-			PrintToChatAll("[NCEV]: NF has a commander candidate/s with votes.");
+			PrintToChatAll("[NCEV]: NF has a commander candidate with votes.");
 		}
-		if (nf1vote == 0  && commsready == 0)
+		if (cexist == 1 && nf1vote == 0  && commsready == 0 && minplayersnr == 0)
 		{
 			PrintToChatAll("[NCEV]: NF has no commander candidate with votes.");
 		}
-		if (be1vote == 1  && commsready == 0)
+		if (cexist == 1 && be1vote == 1  && commsready == 0 && minplayersnr == 0)
 		{
-			PrintToChatAll("[NCEV]: BE has a commander candidate/s with votes.");
+			PrintToChatAll("[NCEV]: BE has a commander candidate with votes.");
 		}
-		if (be1vote == 0  && commsready == 0)
+		if (cexist == 1 && be1vote == 0  && commsready == 0 && minplayersnr == 0)
 		{
 			PrintToChatAll("[NCEV]: BE has no commander candidate with votes.");
 		}

@@ -49,4 +49,7 @@ v0.3 </br>
 -Player cant vote for themselves and be counted as comm ready. </br>
 -Some other things ( Gotta write down changes as I do them xD ) </br>
 -Plugin starts when at least one team has a player. </br>
--Overall improved plugin handling </br>
+-Overall improved plugin handling  </br>
+v0.4 </br>
+-Many bugfixes </br>
+-Quite a lot of polishing </br>

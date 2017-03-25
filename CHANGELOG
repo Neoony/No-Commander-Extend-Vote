@@ -1,0 +1,24 @@
+Changelog:
+v0.1
+-First pre-release
+v0.2
+-Added new console commands
+-Added config
+-Better messages handling
+-Few bugfixes
+v0.2.1 Quickfix
+-Fixed infantry map spam
+-Added message about plugin on "OnClientPutInServer"
+-Few small message changes
+v0.2.2 Quickadd
+-Disabled "comm received vote" and added status of commanders into Timer Info message
+v0.3
+-New command
+-Few bugfixes
+-Player cant vote for themselves and be counted as comm ready
+-Some other things ( Gotta write down changes as I do them xD )
+-Plugin starts when at least one team has a player
+-Overall improved plugin handling 
+v0.4
+-Many bugfixes
+-Quite a lot of polishing

@@ -23,7 +23,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#define PluginVer "v0.2.2"
+#define PluginVer "v0.3"
  
 public Plugin myinfo =
 {
@@ -35,7 +35,7 @@ public Plugin myinfo =
 }
 
 //ConVars
-ConVar nc_setvotetime, nc_addvotetime, nc_minplayers, nc_msgtimer;
+ConVar nc_setvotetime, nc_addvotetime, nc_minplayers, nc_msgtimer, nc_marktime;
 
 int origvotetime;
 int addvotetime;
@@ -49,15 +49,20 @@ int cexist = 2;
 int vtime;
 int plugindone = 0;
 float msgtimer;
+int marktime;
+int playerjoinedteam;
+int teamhasplayer = 0;
+new Handle:InfoMessage;
 
 public void OnPluginStart()
 {
 	//LoadTranslations("common.phrases");
 	
 	//Cvars
-	nc_addvotetime = CreateConVar("nc_addvotetime", "20", "How much to add to the current detected value of commander vote time, when extending vote time.");
-	nc_minplayers = CreateConVar("nc_minplayers", "2", "How many players needed to enable this plugin.(players in a team)");
-	nc_msgtimer = CreateConVar("nc_msgtimer", "15", "How often to display the informational messages.");
+	nc_addvotetime = CreateConVar("nc_addvotetime", "20", "How much to add to the current detected value of (emp_sv_vote_commander_time), when extending vote time.");
+	nc_minplayers = CreateConVar("nc_minplayers", "2", "How many players needed to enable this plugin.(Clients on server..needs fixing to team players)");
+	nc_msgtimer = CreateConVar("nc_msgtimer", "15", "How often to display the informational messages. (Seconds)");
+	nc_marktime = CreateConVar("nc_marktime", "60", "At what time of the commander vote to extend the time. (Seconds)");
 	
 	//Find all console variables
 	nc_setvotetime = FindConVar("emp_sv_vote_commander_time");
@@ -67,14 +72,23 @@ public void OnPluginStart()
 	addvotetime = nc_addvotetime.IntValue;
 	minplayers = nc_minplayers.IntValue;
 	msgtimer = nc_msgtimer.IntValue + 0.0;
+	marktime = nc_marktime.IntValue;
 	
 	//Hook events
 	HookEvent("commander_vote", Event_CommVote);
 	HookEvent("commander_vote_time", Event_CommVoteTime);
+	HookEvent("player_team", Event_PlayerTeam);
 	HookEvent("commander_elected_player", Event_ElectedPlayer);
 	
+	//Clear timer
+	if (InfoMessage != INVALID_HANDLE)
+	{
+		KillTimer(InfoMessage);
+		InfoMessage = INVALID_HANDLE;
+	}
+	
 	//Timers for messages
-	CreateTimer(msgtimer, InfoMsg, _, TIMER_REPEAT);
+	InfoMessage = CreateTimer(msgtimer, InfoMsg, _, TIMER_REPEAT);
 	
 	//Message
 	PrintToServer("[NCEV]: No Commander Extend Vote by Neoony - Loaded");
@@ -85,64 +99,80 @@ public OnClientPutInServer(Client)
 	PrintToChat(Client, "[NCEV]: This server is running [No Comm Extend Vote] by Neoony");
 }
 
+public OnMapEnd()
+{
+	addvotetime = nc_addvotetime.IntValue;
+	minplayers = nc_minplayers.IntValue;
+	msgtimer = nc_msgtimer.IntValue + 0.0;
+	marktime = nc_marktime.IntValue;
+	minplayersnr = 0;
+	nf1vote = 0;
+	be1vote = 0;
+	commsready = 0;
+	cexist = 2;
+	plugindone = 0;	
+	teamhasplayer = 0;
+}
+
 public Action InfoMsg(Handle timer)
 {
-	if (commsready == 1 && plugindone != 1)
+	GetConVarInt(nc_msgtimer);
+	if (teamhasplayer == 1)
 	{
-		PrintToChatAll("[NCEV]: Both teams have a commander, not extending");
+		if (commsready == 1 && plugindone != 1)
+		{
+			PrintToChatAll("[NCEV]: Both teams have a commander, not extending");
+		}
+		if (minplayersnr == 1 && plugindone != 1)
+		{
+			PrintToChatAll("[NCEV]: Not enough players - plugin disabled");
+			//PrintToServer("[NCEV]: Not enough players - plugin disabled");
+		}
+		if (cexist == 0 && plugindone != 1)
+		{
+			//PrintToChatAll("[NCEV]: Infantry map - plugin disabled");
+			PrintToServer("[NCEV]: Infantry map - plugin disabled");
+			plugindone = 1;
+		}
+		if (nf1vote == 1 && commsready == 0)
+		{
+			PrintToChatAll("[NCEV]: NF has a commander candidate/s with votes.");
+		}
+		if (nf1vote == 0  && commsready == 0)
+		{
+			PrintToChatAll("[NCEV]: NF has no commander candidate with votes.");
+		}
+		if (be1vote == 1  && commsready == 0)
+		{
+			PrintToChatAll("[NCEV]: BE has a commander candidate/s with votes.");
+		}
+		if (be1vote == 0  && commsready == 0)
+		{
+			PrintToChatAll("[NCEV]: BE has no commander candidate with votes.");
+		}
 	}
-	if (minplayersnr == 1 && plugindone != 1)
-	{
-		PrintToChatAll("[NCEV]: Not enough players - plugin disabled");
-		//PrintToServer("[NCEV]: Not enough players - plugin disabled");
-	}
-	if (cexist == 0 && plugindone != 1)
-	{
-		//PrintToChatAll("[NCEV]: Infantry map - plugin disabled");
-		PrintToServer("[NCEV]: Infantry map - plugin disabled");
-		plugindone = 1;
-	}
-	if (nf1vote == 1)
-	{
-		PrintToChatAll("[NCEV]: NF has a commander candidate/s with votes.");
-	}
-	if (nf1vote == 0)
-	{
-		PrintToChatAll("[NCEV]: NF has no commander candidate with votes.");
-	}
-	if (be1vote == 1)
-	{
-		PrintToChatAll("[NCEV]: BE has a commander candidate/s with votes.");
-	}
-	if (be1vote == 0)
-	{
-		PrintToChatAll("[NCEV]: BE has no commander candidate with votes.");
-	}
-	if (plugindone == 0)
-	{
-        return Plugin_Continue;
-    }
-	if (plugindone == 1)
-	{
-		PrintToServer("[NCEV]: Plugin disabled.");
-		return Plugin_Stop;
-	}
-	
-	return Plugin_Continue;
 }
-	
+
 public Event_CommVote(Handle:event, const char[] name, bool dontBroadcast)
 {	
 	//PrintToChatAll("commander_vote event");
 	//PrintToServer("commander_vote event");
 	int cvote = GetEventInt(event, "team");
-	if (cvote == 0)
+	int cvoter_id = GetEventInt(event, "voter_id");
+	int cplayer_id = GetEventInt(event, "player_id");
+	if (cvoter_id == cplayer_id)
+	{
+		//PrintToServer("[NCEV]: Commander candidate voted for himself");
+	}
+	//delete for testing alone
+	// && cvoter_id != cplayer_id
+	if (cvote == 0 && cvoter_id != cplayer_id)
 	{
 		//PrintToChatAll("[NCEV]: NF has received comm vote");
 		//PrintToServer("[NCEV]: NF has received comm vote");
 		nf1vote = 1;
 	} 
-	if (cvote == 1) 
+	if (cvote == 1 && cvoter_id != cplayer_id) 
 	{
 		//PrintToChatAll("[NCEV]: BE has received comm vote");
 		//PrintToServer("[NCEV]: BE has received comm vote");
@@ -156,15 +186,16 @@ public Event_CommVoteTime(Handle:event, const char[] name, bool dontBroadcast)
 	vtime = GetEventInt(event, "time");
 	GetConVarInt(nc_addvotetime);
 	GetConVarInt(nc_minplayers);
+	GetConVarInt(nc_marktime);
 	ClientNumber = GetClientCount();
 	minplayers = nc_minplayers.IntValue;
 	if (ClientNumber <  minplayers)
 	{
-		minplayersnr = 1
+		minplayersnr = 1;
 	}
 	if (ClientNumber >=  minplayers)
 	{
-		minplayersnr = 0
+		minplayersnr = 0;
 	}
 	//PrintToChatAll("commander_vote_time event");
 	//PrintToServer("commander_vote_time event");
@@ -172,7 +203,7 @@ public Event_CommVoteTime(Handle:event, const char[] name, bool dontBroadcast)
 	{
 		//PrintToChatAll("commander exists");
 		//PrintToServer("commander exists");
-		if (vtime < 60)
+		if (vtime < marktime)
 		{
 			//PrintToChatAll("less than 60");
 			//PrintToServer("less than 60");
@@ -180,49 +211,68 @@ public Event_CommVoteTime(Handle:event, const char[] name, bool dontBroadcast)
 			{
 				commsready = 1;
 			}
-			if (nf1vote != 1)
-			{
-				PrintToChatAll("[NCEV]: NF has no commander, extending time");
-			}
-			if (be1vote != 1)
-			{
-				PrintToChatAll("[NCEV]: BE has no commander, extending time");
-			}
 			if (commsready != 1)
 			{
 				origvotetime = nc_setvotetime.IntValue;
 				addvotetime = nc_addvotetime.IntValue;
 				nc_setvotetime.IntValue = origvotetime + addvotetime;
+				PrintToChatAll("[NCEV]: Commanders not ready in both teams, extending time.");
 			}
 		}
 	}
 }
-	
+
+public Event_PlayerTeam(Handle:event, const char[] name, bool dontBroadcast)
+{
+	playerjoinedteam = GetEventInt(event, "team");
+	if (playerjoinedteam == 2)
+	{
+		//PrintToChatAll("[NCEV]: Player joined NF");
+		//PrintToServer("[NCEV]: Player joined NF");
+		teamhasplayer = 1;
+	}
+	if (playerjoinedteam == 3)
+	{
+		//PrintToChatAll("[NCEV]: Player joined BE");
+		//PrintToServer("[NCEV]: Player joined BE");
+		teamhasplayer = 1;
+	}
+}
+
 public Event_ElectedPlayer(Handle:event, const char[] name, bool dontBroadcast)
 {	
 	//PrintToChatAll("commander_elected_player event");
 	//PrintToServer("commander_elected_player event");
 	int enf = GetEventInt(event, "elected_nf_comm_id");
 	int ebe = GetEventInt(event, "elected_be_comm_id");
-	plugindone = 1;
 	if (enf != -1)
 	{
 		PrintToChatAll("[NCEV]: NF elected commander");
 		//PrintToServer("[NCEV]: NF elected commander");
+		plugindone = 1;
 	}
 	if (enf == -1)
 	{
 		PrintToChatAll("[NCEV]: NF started with no commander");
 		//PrintToServer("[NCEV]: NF started with no commander");
+		plugindone = 1;
 	}
 	if (ebe != -1)
 	{
 		PrintToChatAll("[NCEV]: BE elected commander");
 		//PrintToServer("[NCEV]: BE elected commander");
+		plugindone = 1;
 	}
 	if (ebe == -1)
 	{
 		PrintToChatAll("[NCEV]: BE started with no commander");
 		//PrintToServer("[NCEV]: BE started with no commander");
+		plugindone = 1;
+	}
+	if (InfoMessage != INVALID_HANDLE && plugindone == 1)
+	{
+		KillTimer(InfoMessage);
+		PrintToServer("[NCEV]: InfoMessage disabled. End of vote.");
+		InfoMessage = INVALID_HANDLE;
 	}
 }

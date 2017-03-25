@@ -7,16 +7,19 @@ THIS IS IN VERY EARLY STATE </br>
 
 Commands:
 "nc_addvotetime" "def. 20" </br>
-"How much to add to the current detected value of commander vote time, when extending vote time." </br>
+"How much to add to the current detected value of commander vote time, when extending vote time. (Seconds)" </br>
 
 "nc_minplayers" "def. 2" </br>
-"How many players needed to enable this plugin.(players in a team)" </br>
+"How many players needed to enable this plugin.(Clients on server..needs fixing to team players)" </br>
 
 "nc_msgtimer" "def. 15" </br>
-"How often to display the informational messages." </br>
+"How often to display the informational messages. (Seconds) </br>
 
-If the commander vote time is below 60 it will add extra time if no team has yet voted for a commander. </br>
-It will keep extending the vote time by approximately 20 seconds, each time it gets below 60 seconds with no comms  </br>
+"nc_marktime" "def. 60" </br>
+"At what time of the commander vote to extend the time. (Seconds)" </br>
+
+If the commander vote time is below "nc_marktime" it will add extra time if no team has yet voted for a commander. </br>
+It will keep extending the vote time by adding "nc_addvotetime" to the current detected vote time, each time it gets below 60 seconds with no comms  </br>
 
 Issues: </br>
 If somebody opts in for a commander and somebody votes for him, and then the commander opts out, it will still count as if the team has a commander. </br>
@@ -39,4 +42,9 @@ v0.2.1 Quickfix </br>
 -Added message about plugin on "OnClientPutInServer" </br>
 -Few small message changes </br>
 v0.2.2 Quickadd </br>
--Disabled "comm received vote" and added status of commanders into Timer Info message.
+-Disabled "comm received vote" and added status of commanders into Timer Info message. </br>
+v0.3 </br>
+-New command </br>
+-Few bugfixes </br>
+-Player cant vote for themselves and be counted as comm ready. </br>
+-Some other things ( Gotta write down changes as I do them xD ) </br>

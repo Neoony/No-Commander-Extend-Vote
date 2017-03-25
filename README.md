@@ -19,7 +19,7 @@ Commands:
 "At what time of the commander vote to extend the time. (Seconds)" </br>
 
 If the commander vote time is below "nc_marktime" it will add extra time if no team has yet voted for a commander. </br>
-It will keep extending the vote time by adding "nc_addvotetime" to the current detected vote time, each time it gets below 60 seconds with no comms  </br>
+It will keep extending the vote time by adding "nc_addvotetime" to the current detected vote time.</br>
 
 Issues: </br>
 If somebody opts in for a commander and somebody votes for him, and then the commander opts out, it will still count as if the team has a commander. </br>

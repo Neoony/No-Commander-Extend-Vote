@@ -1,7 +1,7 @@
 # No-Commander-Extend-Vote  
 **Extend commander vote when nobody opted in and someone voted for him**  
   
-***Project moving to:*** https://git.empiresmod.com/sourcemod/no_commander_extend_vote
+***Project moving to:*** https://git.empiresmod.com/sourcemod/no_commander_extend_vote  
 **Latest version:** http://sourcemod.docs.empiresmod.com/no_commander_extend_vote/NoCommExtendVote.smx  
 *Created by* **Neoony**  
   
